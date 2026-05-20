@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deteksi Phishing Website</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="header">
+  <h1>Deteksi Phishing Website</h1>
+  <div class="badge">SVM + K-Fold CV</div>
+</div>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Masukkan URL</h2>
+    <div class="input-group">
+      <input type="text" id="urlInput" placeholder="https://contoh.com/halaman" />
+      <button class="btn" id="checkBtn" onclick="checkURL()">Analisis</button>
+    </div>
+    <div class="model-info">
+      <div class="model-badge">Kernel: <span>RBF</span></div>
+      <div class="model-badge">Akurasi: <span>95.87%</span></div>
+      <div class="model-badge">K-Fold: <span>k=10</span></div>
+      <div class="model-badge">Dataset: <span>11.430 URL</span></div>
+    </div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div>Menganalisis URL...</div>
+  </div>
+
+  <div class="card result-card" id="resultCard">
+    <div class="result-header" id="resultHeader">
+      <div class="result-icon" id="resultIcon"></div>
+      <div>
+        <div class="result-label" id="resultLabel"></div>
+        <div class="result-sub" id="resultSub"></div>
+      </div>
+    </div>
+    <div class="url-display" id="urlDisplay"></div>
+    <div class="section-title">Detail Fitur URL (Input ke Model SVM)</div>
+    <div class="feature-note">Nilai-nilai berikut adalah fitur yang diekstrak dari URL dan digunakan model SVM untuk menghasilkan prediksi di atas.</div>
+    <div id="featureGroups"></div>
+  </div>
+
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
