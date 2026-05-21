@@ -12,10 +12,12 @@ from urllib.parse import urlparse
 
 app = Flask(__name__)
 
-# Load model, scaler, dan feature names
-model         = joblib.load('svm_model.pkl')
-scaler        = joblib.load('scaler.pkl')
-feature_names = joblib.load('feature_names.pkl')
+# Load model, scaler, dan feature names untuk XGBoost
+model         = joblib.load('models/xgboost/xgb_model.pkl')
+scaler        = joblib.load('models/xgboost/xgb_scaler.pkl')
+selector      = joblib.load('models/xgboost/xgb_selector.pkl')
+feature_names = joblib.load('models/xgboost/xgb_features.pkl')
+all_features  = joblib.load('models/xgboost/all_features.pkl')
 
 # ================================================================
 # EKSTRAKSI FITUR DARI URL (mengubah URL menjadi 87 angka)
@@ -51,7 +53,9 @@ def extract_features(url):
     features['nb_space']       = full_url.count(' ')
     features['nb_www']         = full_url.lower().count('www')
     features['nb_com']         = full_url.lower().count('.com')
-    features['nb_dslash']      = full_url.count('//')
+    
+    url_no_protocol = full_url.replace('http://', '').replace('https://', '')
+    features['nb_dslash']      = url_no_protocol.count('//')
 
     features['http_in_path'] = 1 if 'http' in path.lower() else 0
     features['https_token']  = 1 if 'https' in hostname.lower() else 0
@@ -85,9 +89,11 @@ def extract_features(url):
     features['longest_words_raw']  = max((len(w) for w in words), default=0)
     features['longest_word_host']  = max((len(w) for w in re.split(r'[\W_]+', hostname) if w), default=0)
     features['longest_word_path']  = max((len(w) for w in re.split(r'[\W_]+', path) if w), default=0)
+    words_host = [w for w in re.split(r'[\W_]+', hostname) if w]
+    words_path = [w for w in re.split(r'[\W_]+', path) if w]
     features['avg_words_raw']      = round(np.mean([len(w) for w in words]) if words else 0, 4)
-    features['avg_word_host']      = round(np.mean([len(w) for w in re.split(r'[\W_]+', hostname) if w]) if hostname else 0, 4)
-    features['avg_word_path']      = round(np.mean([len(w) for w in re.split(r'[\W_]+', path) if w]) if path else 0, 4)
+    features['avg_word_host']      = round(np.mean([len(w) for w in words_host]) if words_host else 0, 4)
+    features['avg_word_path']      = round(np.mean([len(w) for w in words_path]) if words_path else 0, 4)
 
     phish_keywords = ['login', 'secure', 'account', 'update', 'confirm', 'verify',
                       'bank', 'paypal', 'password', 'signin', 'ebay', 'apple', 'amazon']
@@ -109,8 +115,8 @@ def extract_features(url):
                 'dns_record', 'google_index', 'page_rank']:
         features[key] = 0
 
-    feature_vector = [features.get(f, 0) for f in feature_names]
-    return feature_vector, features
+    feature_vector_87 = [features.get(f, 0) for f in all_features]
+    return feature_vector_87, features
 
 
 # ================================================================
@@ -135,10 +141,13 @@ def predict():
         # Ekstrak 87 fitur dari URL
         feature_vector, features = extract_features(url)
 
-        # Normalisasi dan prediksi oleh model SVM
+        # Normalisasi dan seleksi fitur XGBoost
         X_input  = np.array(feature_vector).reshape(1, -1)
         X_scaled = scaler.transform(X_input)
-        pred     = model.predict(X_scaled)[0]
+        X_selected = selector.transform(X_scaled)
+        
+        # Prediksi
+        pred     = model.predict(X_selected)[0]
         label    = 'phishing' if pred == 1 else 'legitimate'
 
         # Kelompokkan fitur untuk ditampilkan di GUI
