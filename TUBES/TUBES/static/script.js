@@ -3,8 +3,8 @@ async function checkURL() {
   if (!url) { alert('Masukkan URL terlebih dahulu'); return; }
 
   document.getElementById('checkBtn').disabled = true;
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('resultCard').style.display = 'none';
+  document.getElementById('loading').classList.remove('d-none');
+  document.getElementById('resultCard').classList.add('d-none');
 
   try {
     const res = await fetch('/predict', {
@@ -13,52 +13,26 @@ async function checkURL() {
       body: JSON.stringify({ url })
     });
     const data = await res.json();
-
     if (data.error) { alert('Error: ' + data.error); return; }
 
     const isPhishing = data.label === 'phishing';
 
-    // Hasil prediksi SVM
-    document.getElementById('resultHeader').className  = 'result-header ' + data.label;
-    document.getElementById('resultIcon').textContent  = isPhishing ? 'WARNING' : 'NO';
-    document.getElementById('resultLabel').textContent = isPhishing ? 'PHISHING' : 'LEGITIMATE';
-    document.getElementById('resultLabel').className   = 'result-label ' + data.label;
-    document.getElementById('resultSub').textContent   = isPhishing
-      ? 'Model SVM mendeteksi URL ini sebagai situs phishing.'
-      : 'Model SVM mendeteksi URL ini sebagai situs legitimate.';
+    const verdictCard = document.getElementById('verdictCard');
+    verdictCard.className = 'verdict-card ' + data.label;
 
-    document.getElementById('urlDisplay').textContent = data.url;
+    document.getElementById('verdictIcon').textContent  = isPhishing ? '!' : '';
+    document.getElementById('verdictLabel').textContent = isPhishing ? 'PHISHING' : 'LEGITIMATE';
+    document.getElementById('urlDisplay').textContent   = data.url;
+    document.getElementById('resultSub').textContent    = isPhishing
+      ? 'Model XGBoost mendeteksi pola mencurigakan pada URL ini. Hindari memasukkan data pribadi.'
+      : 'Model XGBoost tidak mendeteksi pola phishing. URL ini terlihat aman.';
 
-    // Tampilkan fitur mentah hasil ekstraksi
-    const container = document.getElementById('featureGroups');
-    container.innerHTML = '';
-
-    data.feature_groups.forEach(group => {
-      const groupEl = document.createElement('div');
-      groupEl.className = 'feature-group';
-
-      let rows = '';
-      group.items.forEach(item => {
-        rows += `
-          <tr>
-            <td class="col-label">${item.label}</td>
-            <td class="col-value">${item.value}</td>
-          </tr>`;
-      });
-
-      groupEl.innerHTML = `
-        <div class="group-title">${group.group}</div>
-        <table class="feature-table"><tbody>${rows}</tbody></table>`;
-
-      container.appendChild(groupEl);
-    });
-
-    document.getElementById('resultCard').style.display = 'block';
+    document.getElementById('resultCard').classList.remove('d-none');
 
   } catch (e) {
     alert('Gagal menghubungi server: ' + e.message);
   } finally {
-    document.getElementById('loading').style.display = 'none';
+    document.getElementById('loading').classList.add('d-none');
     document.getElementById('checkBtn').disabled = false;
   }
 }
