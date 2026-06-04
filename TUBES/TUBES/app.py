@@ -13,12 +13,10 @@ from urllib.parse import urlparse
 
 app = Flask(__name__)
 
-# Load model XGBoost, scaler, selector, dan feature names
-model         = joblib.load('models/xgboost/xgb_model.pkl')
-scaler        = joblib.load('models/xgboost/xgb_scaler.pkl')
-selector      = joblib.load('models/xgboost/xgb_selector.pkl')
-feature_names = joblib.load('models/xgboost/xgb_features.pkl')
-all_features  = joblib.load('models/xgboost/all_features.pkl')
+# Load model SVM, scaler, and feature names
+model         = joblib.load('models/svm/svm_model.pkl')
+scaler        = joblib.load('models/svm/scaler.pkl')
+all_features  = joblib.load('models/svm/feature_names.pkl')
 
 # ================================================================
 # EKSTRAKSI FITUR DARI URL
@@ -150,12 +148,11 @@ def predict():
         if not url.startswith(('http://', 'https://')):
             url = 'http://' + url
 
-        # Ekstrak fitur → scale → select → prediksi
+        # Ekstrak fitur → scale → prediksi
         feature_vector, features = extract_features(url)
         X_input    = np.array(feature_vector).reshape(1, -1)
         X_scaled   = scaler.transform(X_input)
-        X_selected = selector.transform(X_scaled)
-        pred       = model.predict(X_selected)[0]
+        pred       = model.predict(X_scaled)[0]
         label      = 'phishing' if pred == 1 else 'legitimate'
 
         feature_groups = [
