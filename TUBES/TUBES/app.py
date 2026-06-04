@@ -13,10 +13,20 @@ from urllib.parse import urlparse
 
 app = Flask(__name__)
 
-# Load model SVM, scaler, and feature names
-model         = joblib.load('models/svm/svm_model.pkl')
-scaler        = joblib.load('models/svm/scaler.pkl')
-all_features  = joblib.load('models/svm/feature_names.pkl')
+# Load model SVM
+svm_model    = joblib.load('models/svm/svm_model.pkl')
+svm_scaler   = joblib.load('models/svm/scaler.pkl')
+svm_features = joblib.load('models/svm/feature_names.pkl')
+
+# Load model XGBoost
+xgb_model    = joblib.load('models/xgboost/xgb_model.pkl')
+xgb_scaler   = joblib.load('models/xgboost/xgb_scaler.pkl')
+xgb_selector = joblib.load('models/xgboost/xgb_selector.pkl')
+xgb_features = joblib.load('models/xgboost/all_features.pkl')
+
+# Set default model objects (SVM as default fallback)
+model = svm_model
+scaler = svm_scaler
 
 # ================================================================
 # EKSTRAKSI FITUR DARI URL
@@ -125,8 +135,7 @@ def extract_features(url):
                 'dns_record', 'google_index', 'page_rank']:
         features[key] = 0
 
-    feature_vector = [features.get(f, 0) for f in all_features]
-    return feature_vector, features
+    return features
 
 
 # ================================================================
@@ -142,18 +151,41 @@ def predict():
     try:
         data = request.get_json()
         url  = data.get('url', '').strip()
+        model_type = data.get('model', 'svm').lower() # default ke svm
 
         if not url:
             return jsonify({'error': 'URL tidak boleh kosong'})
         if not url.startswith(('http://', 'https://')):
             url = 'http://' + url
 
-        # Ekstrak fitur → scale → prediksi
-        feature_vector, features = extract_features(url)
-        X_input    = np.array(feature_vector).reshape(1, -1)
-        X_scaled   = scaler.transform(X_input)
-        pred       = model.predict(X_scaled)[0]
-        label      = 'phishing' if pred == 1 else 'legitimate'
+        # Ekstrak fitur (raw dictionary)
+        features = extract_features(url)
+        
+        # Eksekusi pipeline sesuai model yang dipilih
+        if model_type == 'xgboost':
+            feature_vector = [features.get(f, 0) for f in xgb_features]
+            X_input    = np.array(feature_vector).reshape(1, -1)
+            # XGBoost pipeline: scaler -> selector -> predict
+            try:
+                X_scaled   = xgb_scaler.transform(X_input)
+            except:
+                X_scaled   = X_input # Fallback just in case of scaler version mismatch
+            try:
+                X_selected = xgb_selector.transform(X_scaled)
+            except:
+                X_selected = X_scaled
+            pred       = xgb_model.predict(X_selected)[0]
+            used_model = 'XGBoost'
+        else:
+            # Default to SVM
+            feature_vector = [features.get(f, 0) for f in svm_features]
+            X_input    = np.array(feature_vector).reshape(1, -1)
+            # SVM pipeline: scaler -> predict
+            X_scaled   = svm_scaler.transform(X_input)
+            pred       = svm_model.predict(X_scaled)[0]
+            used_model = 'SVM'
+
+        label = 'phishing' if pred == 1 else 'legitimate'
 
         feature_groups = [
             {
@@ -215,11 +247,11 @@ def predict():
         ]
 
         return jsonify({
-            'url'           : url,
-            'label'         : label,
-            'feature_groups': feature_groups,
+            'url': url,
+            'label': label,
+            'model_used': used_model,
+            'feature_groups': feature_groups
         })
-
     except Exception as e:
         return jsonify({'error': str(e)})
 

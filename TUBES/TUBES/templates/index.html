@@ -44,7 +44,15 @@
         <!-- INPUT CARD -->
         <div class="card-custom mb-4">
           <div class="card-custom-body">
-            <label class="form-label-custom">URL yang ingin dianalisis</label>
+            <div class="d-flex justify-content-between align-items-end mb-2">
+              <label class="form-label-custom mb-0">URL yang ingin dianalisis</label>
+              <div>
+                <select id="modelSelect" class="form-select form-select-sm" style="background-color: var(--surface-light); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px;">
+                  <option value="svm" selected>Model: SVM (Akurat & Stabil)</option>
+                  <option value="xgboost">Model: XGBoost (Agresif / Strict)</option>
+                </select>
+              </div>
+            </div>
             <div class="input-row mb-3">
               <input type="text" id="urlInput" class="input-custom" placeholder="https://contoh.com/halaman" />
               <button class="btn-analyze" id="checkBtn" onclick="checkURL()">
@@ -53,8 +61,8 @@
             </div>
             <div class="d-flex gap-2 flex-wrap">
               <span class="stat-chip">Dataset <strong>11.430 URL</strong></span>
-              <span class="stat-chip">Model <strong>SVM (RBF)</strong></span>
-              <span class="stat-chip">Fitur <strong>56 Features</strong></span>
+              <span class="stat-chip" id="uiModelLabel">Model <strong>SVM (RBF)</strong></span>
+              <span class="stat-chip" id="uiFeatureLabel">Fitur <strong>56 Features</strong></span>
               <span class="stat-chip">Split <strong>70/15/15</strong></span>
             </div>
           </div>
