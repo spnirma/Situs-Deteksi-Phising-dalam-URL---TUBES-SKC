@@ -24,8 +24,8 @@ async function checkURL() {
     document.getElementById('verdictLabel').textContent = isPhishing ? 'PHISHING' : 'LEGITIMATE';
     document.getElementById('urlDisplay').textContent   = data.url;
     document.getElementById('resultSub').textContent    = isPhishing
-      ? 'Model XGBoost mendeteksi pola mencurigakan pada URL ini. Hindari memasukkan data pribadi.'
-      : 'Model XGBoost tidak mendeteksi pola phishing. URL ini terlihat aman.';
+      ? 'Model SVM mendeteksi pola mencurigakan pada URL ini. Hindari memasukkan data pribadi.'
+      : 'Model SVM tidak mendeteksi pola phishing. URL ini terlihat aman.';
 
     document.getElementById('resultCard').classList.remove('d-none');
 

@@ -1,6 +1,6 @@
 """
 GUI Deteksi Phishing Website - Flask Localhost
-Model  : XGBoost + Feature Selection + K-Fold CV
+Model  : SVM (RBF Kernel) + StandardScaler + K-Fold CV
 Jalankan: python app.py
 Buka    : http://127.0.0.1:5000
 """
@@ -61,7 +61,7 @@ def extract_features(url):
 
     # HTTP/HTTPS
     features['http_in_path']   = 1 if 'http' in path.lower() else 0
-    features['https_token']    = 1 if 'https' in hostname.lower() else 0
+    features['https_token']    = 0 if parsed.scheme == 'https' else 1
 
     # Rasio digit
     digits_url  = sum(c.isdigit() for c in full_url)
@@ -76,7 +76,7 @@ def extract_features(url):
     features['tld_in_subdomain']   = 0
     subdomain = hostname.replace('www.', '').split('.')[:-2]
     features['abnormal_subdomain'] = 1 if len(subdomain) > 1 else 0
-    features['nb_subdomains']      = len(hostname.split('.')) - 2 if hostname else 0
+    features['nb_subdomains']      = hostname.count('.') if hostname else 0
     features['prefix_suffix']      = 1 if '-' in hostname else 0
     features['random_domain']      = 0
     features['shortening_service'] = 1 if any(s in hostname for s in ['bit.ly', 'tinyurl', 'goo.gl', 't.co', 'ow.ly']) else 0
@@ -86,20 +86,20 @@ def extract_features(url):
     features['nb_redirection']          = url_no_protocol.count('//')
     features['nb_external_redirection'] = 0
 
-    # Statistik kata
-    words      = [w for w in re.split(r'[\W_]+', full_url) if w]
+    # Statistik kata — menggunakan \W+ split sesuai dataset
+    words_all  = [w for w in re.split(r'\W+', full_url) if w]
     words_host = [w for w in re.split(r'[\W_]+', hostname) if w]
     words_path = [w for w in re.split(r'[\W_]+', path) if w]
 
-    features['length_words_raw']   = len(words)
-    features['char_repeat']        = max((full_url.count(c) for c in set(full_url)), default=0)
-    features['shortest_words_raw'] = min((len(w) for w in words), default=0)
+    features['length_words_raw']   = max(len(words_all) - 2, 0)
+    features['char_repeat']        = max((hostname.count(c) for c in set(hostname)), default=0) if hostname else 0
+    features['shortest_words_raw'] = min((len(w) for w in words_all), default=0)
     features['shortest_word_host'] = min((len(w) for w in words_host), default=0)
     features['shortest_word_path'] = min((len(w) for w in words_path), default=0)
-    features['longest_words_raw']  = max((len(w) for w in words), default=0)
+    features['longest_words_raw']  = max((len(w) for w in words_all), default=0)
     features['longest_word_host']  = max((len(w) for w in words_host), default=0)
     features['longest_word_path']  = max((len(w) for w in words_path), default=0)
-    features['avg_words_raw']      = round(np.mean([len(w) for w in words]) if words else 0, 4)
+    features['avg_words_raw']      = round(np.mean([len(w) for w in words_all]) if words_all else 0, 4)
     features['avg_word_host']      = round(np.mean([len(w) for w in words_host]) if words_host else 0, 4)
     features['avg_word_path']      = round(np.mean([len(w) for w in words_path]) if words_path else 0, 4)
 
