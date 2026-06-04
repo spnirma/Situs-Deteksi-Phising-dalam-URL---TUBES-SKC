@@ -2,7 +2,7 @@
 
 PhishGuard adalah aplikasi web berbasis Flask yang digunakan untuk mendeteksi apakah sebuah URL merupakan **Legitimate (Aman)** atau **Phishing (Berbahaya)**. Aplikasi ini memanfaatkan arsitektur *Machine Learning* untuk mengekstraksi puluhan fitur struktural dan leksikal langsung dari string URL secara *real-time*.
 
-## ✨ Fitur Utama
+## Fitur Utama
 
 - **Dual-Model ML Architecture**: Mendukung dua model deteksi sekaligus yang dapat dialihkan langsung melalui antarmuka web.
   - **SVM (RBF Kernel)**: Mengekstraksi 56 fitur leksikal. Sangat akurat, stabil, dan menghindari *False Positive* pada situs-situs populer (Cocok untuk penggunaan sehari-hari).
@@ -12,7 +12,7 @@ PhishGuard adalah aplikasi web berbasis Flask yang digunakan untuk mendeteksi ap
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+## Teknologi yang Digunakan
 
 - **Backend**: Python, Flask, Pandas, NumPy
 - **Machine Learning**: Scikit-Learn (SVM), XGBoost
@@ -21,7 +21,7 @@ PhishGuard adalah aplikasi web berbasis Flask yang digunakan untuk mendeteksi ap
 
 ---
 
-## 🚀 Cara Menjalankan Aplikasi Lokal
+## Cara Menjalankan Aplikasi Lokal
 
 1. **Clone repositori ini:**
    ```bash
@@ -46,7 +46,7 @@ PhishGuard adalah aplikasi web berbasis Flask yang digunakan untuk mendeteksi ap
 
 ---
 
-## 📊 Komparasi Model (SVM vs XGBoost)
+## Komparasi Model (SVM vs XGBoost)
 
 Berikut adalah ringkasan singkat pengujian sampel 200 URL (100 legitimate, 100 phishing):
 
@@ -60,8 +60,3 @@ Berikut adalah ringkasan singkat pengujian sampel 200 URL (100 legitimate, 100 p
 
 ---
 
-## 👨‍💻 Kontributor
-
-Tugas Besar (TUBES) - Keamanan Sistem & Komputer (SKC) Semester 6.
-Dikembangkan oleh:
-- **Spnirma (Beserta Anggota Kelompok)**
