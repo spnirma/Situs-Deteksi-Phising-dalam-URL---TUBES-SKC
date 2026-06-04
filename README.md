@@ -1,55 +1,67 @@
-# Situs Deteksi Phishing dalam URL - TUBES SKC
+# PhishGuard — Deteksi URL Phishing Berbasis Machine Learning
 
-Proyek ini adalah implementasi sistem deteksi *phishing* berbasis URL menggunakan Machine Learning.
+PhishGuard adalah aplikasi web berbasis Flask yang digunakan untuk mendeteksi apakah sebuah URL merupakan **Legitimate (Aman)** atau **Phishing (Berbahaya)**. Aplikasi ini memanfaatkan arsitektur *Machine Learning* untuk mengekstraksi puluhan fitur struktural dan leksikal langsung dari string URL secara *real-time*.
 
-## Struktur Direktori
-Proyek ini telah direstrukturisasi agar lebih rapi dan profesional:
+## ✨ Fitur Utama
 
-```
-├── TUBES/TUBES/
-│   ├── app.py                      # File utama untuk menjalankan Flask GUI
-│   ├── dataset/                    # Direktori dataset latih
-│   ├── dataset_phishing.csv        # File CSV dataset (87 fitur)
-│   ├── live_test_models.py         # Skrip untuk menguji URL real-live (TDD)
-│   ├── models/
-│   │   ├── svm/                    # Model dan skrip training untuk algoritma SVM
-│   │   │   ├── Kode_Model_OpsiA.py
-│   │   │   ├── Kode_Model_OpsiB.py
-│   │   │   ├── svm_model.pkl, scaler.pkl, feature_names.pkl
-│   │   └── xgboost/                # Model dan skrip training untuk algoritma XGBoost
-│   │       ├── Kode_Model_Dosen.py
-│   │       ├── xgb_model.pkl, xgb_scaler.pkl, xgb_selector.pkl, dll.
-│   ├── static/                     # Aset web (CSS/JS/Gambar)
-│   ├── templates/                  # Template HTML untuk antarmuka pengguna
-│   └── README.md                   # File informasi proyek
-```
+- **Dual-Model ML Architecture**: Mendukung dua model deteksi sekaligus yang dapat dialihkan langsung melalui antarmuka web.
+  - **SVM (RBF Kernel)**: Mengekstraksi 56 fitur leksikal. Sangat akurat, stabil, dan menghindari *False Positive* pada situs-situs populer (Cocok untuk penggunaan sehari-hari).
+  - **XGBoost**: Mengekstraksi 87 fitur. Sangat agresif dan *strict* dalam memblokir potensi ancaman (Mode keamanan preventif).
+- **Ekstraksi Fitur Mandiri**: Menganalisis elemen-elemen URL seperti panjang *hostname*, *subdomain*, eksistensi karakter khusus, hingga analisis sintaks teks.
+- **Antarmuka Modern & Responsif**: UI/UX yang profesional, *clean*, dan memberikan *feedback* prediksi yang seketika.
 
-## Update & Perbaikan (Mark: awanmh)
+---
 
-Saya (**awanmh**) telah membenahi dan menambahkan beberapa poin kritikal dalam kode base ini, di antaranya:
+## 🛠️ Teknologi yang Digunakan
 
-1. **Bug Ekstraksi URL Diperbaiki (`app.py`)**
-   - **Fix `nb_dslash`**: Sebelumnya protokol (`https://`) ikut terhitung dalam skor `//`, membuat URL legal seperti Google mendadak punya anomali deviasi raksasa dan ditebak sebagai *phishing*. Saya telah membersihkan logika agar mengabaikan string HTTP/HTTPS.
-   - **Fix `NaN` di Path Kosong**: URL yang hanya bersandar di *root* (e.g. `google.com/`) menghasilkan *error* kalkulasi komputasi stat (perata-rataan me-return `NaN`). Hal ini sudah diperbaiki.
-   
-2. **Implementasi XGBoost (Sesuai Rekomendasi Dosen)**
-   - Saya membuat modul kecerdasan buatan baru di `models/xgboost/Kode_Model_Dosen.py`.
-   - Menghapus metode iterasi lambat (*K-Fold*) menjadi *train_test_split* 50:50.
-   - Memasukkan filter fitur cerdas (*Chi-Square Selection*) untuk membuang metrik tidak berguna dan mengambil tepat **43 fitur unggulan**.
-   - Menghasilkan akurasi evaluasi sebesar **95.64%** (Tercatat lebih tajam mengalahkan SVM yang hanya 89%).
+- **Backend**: Python, Flask, Pandas, NumPy
+- **Machine Learning**: Scikit-Learn (SVM), XGBoost
+- **Frontend**: HTML5, CSS3 (Vanilla / Custom Design), JavaScript
+- **Deployment & Scaling**: Standard WSGI (Flask bawaan untuk local dev)
 
-3. **Injeksi Live Testing Script (TDD)**
-   - Saya membuat `live_test_models.py` untuk mengukur daya tahan kedua arsitektur model (SVM vs XGBoost) menggunakan tautan internet asli yang disedot langsung (*out-of-box*), untuk menyoroti keunggulan parameter masing-masing.
+---
 
-4. **Kerapihan Arsitektur Proyek**
-   - File model yang berceceran (`.pkl`) dan file training python telah dipilah secara struktural ke dalam folder `models/svm` dan `models/xgboost` masing-masing agar terlihat lebih profesional.
+## 🚀 Cara Menjalankan Aplikasi Lokal
 
-## Cara Menjalankan
+1. **Clone repositori ini:**
+   ```bash
+   git clone https://github.com/spnirma/Situs-Deteksi-Phising-dalam-URL---TUBES-SKC.git
+   cd Situs-Deteksi-Phising-dalam-URL---TUBES-SKC/TUBES/TUBES
+   ```
 
-1. Pastikan library terinstall (`flask`, `scikit-learn`, `xgboost`, `pandas`, `numpy`, `joblib`).
-2. Masuk ke direktori `TUBES/TUBES/`.
-3. Jalankan aplikasi via terminal:
+2. **Install dependensi yang dibutuhkan:**
+   Pastikan Python 3 telah terinstall, lalu jalankan:
+   ```bash
+   pip install -r requirements.txt
+   ```
+   *(Atau install manual library utama: `flask`, `scikit-learn`, `xgboost`, `pandas`, `numpy`)*
+
+3. **Jalankan Server:**
    ```bash
    python app.py
    ```
-4. Buka alamat `http://127.0.0.1:5000` di peramban web.
+
+4. **Buka di Web Browser:**
+   Akses `http://127.0.0.1:5000`
+
+---
+
+## 📊 Komparasi Model (SVM vs XGBoost)
+
+Berikut adalah ringkasan singkat pengujian sampel 200 URL (100 legitimate, 100 phishing):
+
+| Metrik | Model SVM | Model XGBoost | Catatan |
+| :--- | :--- | :--- | :--- |
+| **Akurasi Keseluruhan** | **84.0%** | **75.5%** | SVM jauh lebih optimal untuk dataset ini (pada limitasi fitur yang ada). |
+| **False Positives** | Rendah (23/100) | Sangat Tinggi (47/100)| XGBoost sangat agresif mendeteksi situs baru sebagai bahaya. |
+| **False Negatives** | Sedang (9/100) | Sangat Rendah (2/100) | XGBoost hampir tidak pernah kelewatan situs phishing. |
+
+*Untuk penjelasan detail mengenai hasil ekstraksi fitur dan perbandingan komprehensif, silakan lihat file [`komparasi.md`](./TUBES/TUBES/komparasi.md).*
+
+---
+
+## 👨‍💻 Kontributor
+
+Tugas Besar (TUBES) - Keamanan Sistem & Komputer (SKC) Semester 6.
+Dikembangkan oleh:
+- **Spnirma (Beserta Anggota Kelompok)**
