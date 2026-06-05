@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhishGuard - Deteksi Phishing Website</title>
+  <title>Deteksi Phishing Website</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
@@ -16,11 +16,6 @@
       <div class="brand-icon">PG</div>
       <span class="brand-name">PhishGuard</span>
     </div>
-    <div class="d-flex gap-2 flex-wrap">
-      <span class="nav-pill">SVM (RBF)</span>
-      <span class="nav-pill">K-Fold k=10</span>
-      <span class="nav-pill accent">StandardScaler</span>
-    </div>
   </nav>
 
   <!-- HERO -->
@@ -28,8 +23,8 @@
     <div class="container">
       <div class="row justify-content-center text-center">
         <div class="col-lg-7">
-          <div class="hero-tag mb-3">Powered by SVM + StandardScaler</div>
-          <h1 class="hero-title">Deteksi URL <span class="highlight">Phishing</span><br>Secara Instan</h1>
+          <div class="hero-tag mb-3">by SVM + StandardScaler</div>
+          <h1 class="hero-title">Deteksi URL <span class="highlight">Phishing</span>
           <p class="hero-sub mt-3">Masukkan URL dan biarkan model SVM kami menganalisis fitur struktural untuk menentukan apakah situs tersebut aman atau berbahaya.</p>
         </div>
       </div>
@@ -48,8 +43,8 @@
               <label class="form-label-custom mb-0">URL yang ingin dianalisis</label>
               <div>
                 <select id="modelSelect" class="form-select form-select-sm" style="background-color: var(--surface-light); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 8px;">
-                  <option value="svm" selected>Model: SVM (Akurat & Stabil)</option>
-                  <option value="xgboost">Model: XGBoost (Agresif / Strict)</option>
+                  <option value="svm" selected>Model: SVM</option>
+                  <option value="xgboost">Model: XGBoost</option>
                 </select>
               </div>
             </div>
@@ -93,8 +88,8 @@
   <!-- FOOTER -->
   <footer class="footer-bar">
     <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
-      <span>PhishGuard &mdash; Tugas Besar Sistem Kecerdasan Komputasional</span>
-      <span>SVM + K-Fold Cross Validation &mdash; 2026</span>
+      <span>PhishGuard</span>
+      <span>Deteksi URL Phising &mdash; 2026</span>
     </div>
   </footer>
 
@@ -102,3 +97,5 @@
 <script src="/static/script.js"></script>
 </body>
 </html>
+
+  <!-- Buat uji untuk menguatkan gagasan bahwa hasil deteksi akurat/tidak, mungkin untuk uji validitas lebih dalam bisa dicek berdasar isi data dalam web bukan hanya karakter di url -->
